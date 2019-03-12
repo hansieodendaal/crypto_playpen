@@ -1,9 +1,10 @@
 [package]
 name = "crypto_playpen"
 version = "0.1.0"
-authors = ["Philip Robinson <simian@tari.com>"]
+authors = ["Philip Robinson <simian@tari.com>, Hansie Odendaal <pluto@tari.com>"]
 edition = "2018"
 
 [dependencies]
 crypto = { git = 'https://github.com/tari-project/tari/', branch = "development" }
 rand = "0.5.5"
+digest = "0.8.0"
