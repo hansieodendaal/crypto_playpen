@@ -5,7 +5,6 @@ use crypto::{
     keys::{SecretKeyFactory, PublicKey},
     challenge::Challenge,
     common::{Blake256, ByteArray},
-//    hash::Hashable,
 };
 use digest::Digest;
 
@@ -92,7 +91,7 @@ fn main() {
     println!("Anomaly with RistrettoSecretKey (used above) to hex");
     println!("");
 
-    println!(" - [Challenge::<Blake256>.hash().to_hex()] vs. [RistrettoSecretKey.to_hex()]");
+    println!(" - Assert: [Challenge::<Blake256>.hash().to_hex()] vs. [RistrettoSecretKey.to_hex()]");
     assert_eq!(e_hash.to_hex(), e_key.to_hex());
     println!(" - Challenge (in hex) is valid!");
     println!("");
