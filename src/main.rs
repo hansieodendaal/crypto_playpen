@@ -31,7 +31,7 @@ fn main() {
     println!("Owner has RAID_ID");
     println!("");
 
-    let raid_id = String::from("RSt3HqhdvyuBkxqvZfhDtQT1WBC6e11bJ1");
+    let raid_id = String::from("RYqMMuSmBZFQkgp");
     println!(" - RAID_ID (from DNS TXT record: {:?}", raid_id);
 
     // Sign
