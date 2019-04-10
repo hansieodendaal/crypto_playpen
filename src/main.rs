@@ -80,7 +80,7 @@ fn main() {
     let e_verifier_hash = hash_challange(R.to_bytes(), P.to_bytes(), &raid_id.clone().into_bytes());
     println!(" - Challenge: e_verifier_hash=H(R|P|RAID_ID) {:?}", e_verifier_hash.to_hex());    
     let e_verifier_on_G = RistrettoSecretKey::from_hex(&e_verifier_hash.to_hex()).unwrap();
-    println!(" - e_verifier_on_G (on G):                   {:?}", e_verifier_on_G.to_hex());
+    println!(" - e_verifier_on_G:                          {:?}", e_verifier_on_G.to_hex());
     println!(" - Assert: s·G = R + e_verifier_on_G·P");
     assert_eq!(S, R + e_verifier_on_G.clone() * P);
     println!(" - RAID_ID Signature is valid!");
