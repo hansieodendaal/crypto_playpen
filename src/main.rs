@@ -45,55 +45,57 @@ fn main() {
     let P_known = RistrettoPublicKey::from_hex("ca469346d7643336c19155fdf5c6500a5232525ce4eba7e4db757639159e9861").unwrap();
     assert_eq!(P, P_known);
 
-    println!(" - Secret Key (re-used):       {:?}", k.to_hex());
-    println!(" - Public Key (P):             {:?}", P.to_hex());
+    println!(" - Secret Key (re-used):                     {:?}", k.to_hex());
+    println!(" - Public Key (P):                           {:?}", P.to_hex());
 
     // - Generate nonce pair
     let (r, R) = get_keypair();
-    println!(" - Secret Nonce (new):         {:?}", r.to_hex());
-    println!(" - Public Nonce (R):           {:?}", R.to_hex());
+    println!(" - Secret Nonce (new):                       {:?}", r.to_hex());
+    println!(" - Public Nonce (R):                         {:?}", R.to_hex());
 
     // - Generate challenge
     let e_new = Challenge::<Blake256>::new();
-    let e = e_new.concat(R.to_bytes()).
+    let e_signer = e_new.concat(R.to_bytes()).
         concat(P.to_bytes()).
         concat(&raid_id.clone().into_bytes());
-    let e_hash = e.clone().hash();
-    println!(" - Challenge: e=H(R|P|RAID_ID) {:?}", e_hash.to_hex());
+    let e_signer_hash = e_signer.clone().hash();
+    println!(" - Challenge: e_signer_hash=H(R|P|RAID_ID)   {:?}", e_signer_hash.to_hex());
 
     // - Sign the RAID_ID
-    let sig = RistrettoSchnorr::sign(k, r, e.clone()).unwrap();
+    let sig = RistrettoSchnorr::sign(k, r, e_signer.clone()).unwrap();
     let sig_known = sig.get_signature();
-    println!(" - RAID_ID Signature (s):      {:?}", sig_known.to_hex());
+    println!(" - RAID_ID Signature (s):                    {:?}", sig_known.to_hex());
     
     // - Assert signature
     let R_calc = sig.get_public_nonce();
     assert_eq!(R, *R_calc);
-    assert!(sig.verify(&P, e.clone()));
+    assert!(sig.verify(&P, e_signer.clone()));
     
     // Assert signature as verifier
     println!("");
     println!("Verifier check signature, using (s,R,P,RAID_ID) from DNS TXT record");
     println!("");
     let S = RistrettoPublicKey::from_secret_key(&sig_known);
-    println!(" - RAID_ID Pub Sig (S=s·G):    {:?}", S.to_hex());
-    let e_verifier = hash_challange(R.to_bytes(), P.to_bytes(), &raid_id.clone().into_bytes());
-    println!(" - Challenge: e=H(R|P|RAID_ID) {:?}", e_verifier.to_hex());    
-    assert_eq!(e_hash.to_hex(), e_verifier.to_hex());
-    println!(" - Asserted recalculation of hashed challenge");
-    let e_key = RistrettoSecretKey::from_hex(&e_verifier.to_hex()).unwrap();
-    println!(" - Assert: s·G = R + e·P");
-    assert_eq!(S, R + e_key.clone() * P);
+    println!(" - RAID_ID Pub Sig (S=s·G):                  {:?}", S.to_hex());
+    let e_verifier_hash = hash_challange(R.to_bytes(), P.to_bytes(), &raid_id.clone().into_bytes());
+    println!(" - Challenge: e_verifier_hash=H(R|P|RAID_ID) {:?}", e_verifier_hash.to_hex());    
+    let e_verifier_on_G = RistrettoSecretKey::from_hex(&e_verifier_hash.to_hex()).unwrap();
+    println!(" - e_verifier_on_G (on G):                   {:?}", e_verifier_on_G.to_hex());
+    println!(" - Assert: s·G = R + e_verifier_on_G·P");
+    assert_eq!(S, R + e_verifier_on_G.clone() * P);
     println!(" - RAID_ID Signature is valid!");
     
-    //Assert challenge
+    // - Additional asserts, for testing
     println!("");
-    println!("Anomaly with RistrettoSecretKey (used above) to hex");
+    println!("Additional asserts, for testing");
     println!("");
-
-    println!(" - Assert: [Challenge::<Blake256>.hash().to_hex()] vs. [RistrettoSecretKey.to_hex()]");
-    assert_eq!(e_hash.to_hex(), e_key.to_hex());
-    println!(" - Challenge (in hex) is valid!");
-    println!("");
+    println!(" - Assert: e_signer_hash = e_verifier_hash");
+    assert_eq!(e_signer_hash.to_hex(), e_verifier_hash.to_hex());
+    println!(" - Recalculation of hashed challenge is valid!");
+    println!(" - Assert: R + e_signer_on_G·P = R + e_verifier_on_G·P");
+    let e_signer_on_G = RistrettoSecretKey::from_hex(&e_signer_hash.to_hex()).unwrap();
+    assert_eq!(R + e_signer_on_G.clone() * P, R + e_verifier_on_G.clone() * P);
+    println!(" - Equation is valid!");
+    
 
 }
