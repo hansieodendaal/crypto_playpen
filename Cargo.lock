@@ -99,6 +99,7 @@ name = "crypto_playpen"
 version = "0.1.0"
 dependencies = [
  "crypto 0.0.1 (git+https://github.com/tari-project/tari/?branch=development)",
+ "curve25519-dalek 1.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "digest 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

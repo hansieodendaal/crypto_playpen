@@ -8,3 +8,4 @@ edition = "2018"
 crypto = { git = 'https://github.com/tari-project/tari/', branch = "development" }
 rand = "0.5.5"
 digest = "0.8.0"
+curve25519-dalek = "1.0.2"

@@ -7,6 +7,7 @@ use crypto::{
     common::{Blake256, ByteArray},
 };
 use digest::Digest;
+use curve25519_dalek::scalar::Scalar;
 
 fn main() {
 
@@ -79,10 +80,10 @@ fn main() {
     println!(" - RAID_ID Pub Sig (S=s·G):                  {:?}", S.to_hex());
     let e_verifier_hash = hash_challange(R.to_bytes(), P.to_bytes(), &raid_id.clone().into_bytes());
     println!(" - Challenge: e_verifier_hash=H(R|P|RAID_ID) {:?}", e_verifier_hash.to_hex());    
-    let e_verifier_on_G = RistrettoSecretKey::from_hex(&e_verifier_hash.to_hex()).unwrap();
-    println!(" - e_verifier_on_G:                          {:?}", e_verifier_on_G.to_hex());
-    println!(" - Assert: s·G = R + e_verifier_on_G·P");
-    assert_eq!(S, R + e_verifier_on_G.clone() * P);
+    let e_verifier_mod_n = RistrettoSecretKey::from_hex(&e_verifier_hash.to_hex()).unwrap();
+    println!(" - Challenge: e_verifier_mod_n:              {:?}", e_verifier_mod_n.to_hex());
+    println!(" - Assert: s·G = R + e_verifier_mod_n·P");
+    assert_eq!(S, R + e_verifier_mod_n.clone() * P);
     println!(" - RAID_ID Signature is valid!");
     
     // - Additional asserts, for testing
@@ -92,9 +93,9 @@ fn main() {
     println!(" - Assert: e_signer_hash = e_verifier_hash");
     assert_eq!(e_signer_hash.to_hex(), e_verifier_hash.to_hex());
     println!(" - Recalculation of hashed challenge is valid!");
-    println!(" - Assert: R + e_signer_on_G·P = R + e_verifier_on_G·P");
-    let e_signer_on_G = RistrettoSecretKey::from_hex(&e_signer_hash.to_hex()).unwrap();
-    assert_eq!(R + e_signer_on_G.clone() * P, R + e_verifier_on_G.clone() * P);
+    println!(" - Assert: R + e_signer_mod_n·P = R + e_verifier_mod_n·P");
+    let e_signer_mod_n = RistrettoSecretKey::from_hex(&e_signer_hash.to_hex()).unwrap();
+    assert_eq!(R + e_signer_mod_n.clone() * P, R + e_verifier_mod_n.clone() * P);
     println!(" - Equation is valid!");
     
 

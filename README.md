@@ -2,7 +2,8 @@
 
 Using Tari Project's crypto::ristretto to create and verify signatures on a RAID_ID.
 
-Note: `e_verifier_hash` may be equal to `e_verifier_on_G` as shown below, but this is not guaranteed.
+Note: `e_verifier_hash` may be equal to `e_verifier_mod_n` as shown below, but this is not guaranteed.
+       The Scalar struct holds an integer s < 2^{255} which represents an element of Z modulo the group order n.
 
 ``` Text
 Owner has RAID_ID
@@ -13,24 +14,24 @@ Owner sign RAID_ID
 
  - Secret Key (re-used):                     "29bb078b7b2b01e62dd684cd20742b510ece6175fa58d7a79cceeefe5297a804"
  - Public Key (P):                           "ca469346d7643336c19155fdf5c6500a5232525ce4eba7e4db757639159e9861"
- - Secret Nonce (new):                       "98ba8f8ef3d506660dcda4458ccb87bb40875835c4e2d265a34be84d57fd3e0c"
- - Public Nonce (R):                         "dcf3f1a8e8c48f35b4fe04d1d92990fdf949e5dda5132692e0472e7d5418a514"
- - Challenge: e_signer_hash=H(R|P|RAID_ID)   "d3cfe3febbb9bca233e5b5821dde8148f0935d886e327389cd1737f15754e900"
- - RAID_ID Signature (s):                    "ca491c261027b780dd80dbd8f2e7a0f7ed5f10ed2bb8dc2d702c6fa716da610a"
+ - Secret Nonce (new):                       "ba557a86b110b3ef17a86d82d4cbbdcb0b350db40c5a92b7ed67427d0fd18f0f"
+ - Public Nonce (R):                         "aec9ef137994f1750bb53387116830b691b871e4741387d1fa277b7b6c0e3462"
+ - Challenge: e_signer_hash=H(R|P|RAID_ID)   "325755fffeaa3021c46bddc04bbc4e2fd584a30d5caeed311c7e22eb19b72104"
+ - RAID_ID Signature (s):                    "23f2363a2302426ada8a5c004d6b3e76f63a78d230c7d6aaccb010adbcf9af0b"
 
 Verifier check signature, using (s,R,P,RAID_ID) from DNS TXT record
 
- - RAID_ID Pub Sig (S=s·G):                  "62371222aebcc0a52ff6fbd268a7038560ee22d488fa7b91fac64c7ee82f0c56"
- - Challenge: e_verifier_hash=H(R|P|RAID_ID) "d3cfe3febbb9bca233e5b5821dde8148f0935d886e327389cd1737f15754e900"
- - e_verifier_on_G:                          "d3cfe3febbb9bca233e5b5821dde8148f0935d886e327389cd1737f15754e900"
- - Assert: s·G = R + e_verifier_on_G·P
+ - RAID_ID Pub Sig (S=s·G):                  "fc0167f922a640d4e2f989b8d1374ac1f04d8e13a3083d3ff5907ce92763f26f"
+ - Challenge: e_verifier_hash=H(R|P|RAID_ID) "325755fffeaa3021c46bddc04bbc4e2fd584a30d5caeed311c7e22eb19b72104"
+ - Challenge: e_verifier_mod_n:              "325755fffeaa3021c46bddc04bbc4e2fd584a30d5caeed311c7e22eb19b72104"
+ - Assert: s·G = R + e_verifier_mod_n·P
  - RAID_ID Signature is valid!
 
 Additional asserts, for testing
 
  - Assert: e_signer_hash = e_verifier_hash
  - Recalculation of hashed challenge is valid!
- - Assert: R + e_signer_on_G·P = R + e_verifier_on_G·P
+ - Assert: R + e_signer_mod_n·P = R + e_verifier_mod_n·P
  - Equation is valid!
 ```
 
@@ -43,23 +44,23 @@ Owner sign RAID_ID
 
  - Secret Key (re-used):                     "29bb078b7b2b01e62dd684cd20742b510ece6175fa58d7a79cceeefe5297a804"
  - Public Key (P):                           "ca469346d7643336c19155fdf5c6500a5232525ce4eba7e4db757639159e9861"
- - Secret Nonce (new):                       "5d64e67971cacb60e031accc0eea90fb92b2de5f9c0755412b20275035c20e0f"
- - Public Nonce (R):                         "944eab828c73d475b104a8a60291052824a60762daddfb521a80bfc910980732"
- - Challenge: e_signer_hash=H(R|P|RAID_ID)   "29c49637d23201ee302e38be63691e12be30fd1503bc671c62d37aa094aa851c"
- - RAID_ID Signature (s):                    "fc2ccb773f696846f6e107ff9ccd08c11ee9a4075cfb27be8dea5cc76f73d00a"
+ - Secret Nonce (new):                       "66851576f7f858827a87d671dc0ef678e98ec5f58d6d6e36b8b522582be4a603"
+ - Public Nonce (R):                         "36bea71e04ba9fe3ad75d806046117d86edbc4d285249176159a11f40caeeb5c"
+ - Challenge: e_signer_hash=H(R|P|RAID_ID)   "f6a449fa14f1ab9c9027da02b9814ce986cadae0174207d8301274c898074895"
+ - RAID_ID Signature (s):                    "f62c78a058705cab6beae5a61fe68976445944e09fc358f75cd808db74acff0e"
 
 Verifier check signature, using (s,R,P,RAID_ID) from DNS TXT record
 
- - RAID_ID Pub Sig (S=s·G):                  "a2f0121721d2bd3d4e1d41524dfbc71028a195fc02bf37b8a9456603ccbe0226"
- - Challenge: e_verifier_hash=H(R|P|RAID_ID) "29c49637d23201ee302e38be63691e12be30fd1503bc671c62d37aa094aa851c"
- - e_verifier_on_G:                          "3cf0a0dab7cfee955a91401b856f3ffdbd30fd1503bc671c62d37aa094aa850c"
- - Assert: s·G = R + e_verifier_on_G·P
+ - RAID_ID Pub Sig (S=s·G):                  "608045c0cfe40744dcd42a7eda82fd9e69c969ca33224f5a043457aea2aead59"
+ - Challenge: e_verifier_hash=H(R|P|RAID_ID) "f6a449fa14f1ab9c9027da02b9814ce986cadae0174207d8301274c898074895"
+ - Challenge: e_verifier_mod_n:              "a131a5b52775068407a42548e5b8752d86cadae0174207d8301274c898074805"
+ - Assert: s·G = R + e_verifier_mod_n·P
  - RAID_ID Signature is valid!
 
 Additional asserts, for testing
 
  - Assert: e_signer_hash = e_verifier_hash
  - Recalculation of hashed challenge is valid!
- - Assert: R + e_signer_on_G·P = R + e_verifier_on_G·P
+ - Assert: R + e_signer_mod_n·P = R + e_verifier_mod_n·P
  - Equation is valid!
 ```
